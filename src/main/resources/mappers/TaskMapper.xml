@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.todolist.dao.TaskDao">
+    <insert
+            id="addTask"
+            useGeneratedKeys="true"
+            keyProperty="id"
+    >
+        insert into task_table (title, content, startDate, endDate, done)
+        values (#{title}, #{content}, #{startDate}, #{endDate}, false)
+    </insert>
+    <insert
+            id="setUserOwner"
+    >
+        insert into user_task_table (userID, taskID)
+        values (#{userID}, #{taskID})
+    </insert>
+    <insert
+            id="setTeamOwner"
+    >
+        insert into team_task_table (teamID, taskID, assignee)
+        values (#{teamID}, #{taskID}, #{assignee})
+    </insert>
+    <select
+            id="getTaskInfo"
+            resultType="com.example.todolist.pojo.Do.TaskInfo"
+    >
+        select id,
+               title,
+               content,
+               startDate,
+               endDate,
+               done
+        from task_table
+        where id = #{id}
+    </select>
+    <select
+            id="getUserTask"
+            resultType="com.example.todolist.pojo.Do.TaskInfo"
+    >
+        select *
+        from task_table
+        where id in (select taskID from user_task_table where userID = #{userID})
+        <if test="done != null">
+            and done = #{done}
+        </if>
+    </select>
+    <select
+            id="getTeamTask"
+            resultType="com.example.todolist.pojo.Do.TaskInfo"
+    >
+        select *
+        from task_table
+        where id in (select taskID from team_task_table where teamID = #{teamID})
+        <if test="done != null">
+            and done = #{done}
+        </if>
+    </select>
+    <select
+            id="getTeamTaskAssignee"
+            resultType="com.example.todolist.pojo.Do.TaskInfo"
+    >
+        select taskID,
+               assignee
+        from team_task_table
+        where teamID = #{teamID}
+    </select>
+    <update
+            id="updateTask"
+            parameterType="com.example.todolist.pojo.Do.TaskInfo"
+    >
+        update task_table
+        set title     = #{title},
+            content   = #{content},
+            startDate = #{startDate},
+            endDate   = #{endDate},
+            done      = #{done}
+        where id = #{id};
+    </update>
+    <update
+            id="updateTaskTitle"
+    >
+        update task_table
+        set title = #{title}
+        where id = #{id};
+    </update>
+    <update
+            id="updateTaskContent"
+    >
+        update task_table
+        set content = #{content}
+        where id = #{id};
+    </update>
+    <update
+            id="updateTaskStartDate"
+    >
+        update task_table
+        set startDate = #{startDate}
+        where id = #{id};
+    </update>
+    <update
+            id="updateTaskEndDate"
+    >
+        update task_table
+        set endDate = #{endDate}
+        where id = #{id};
+    </update>
+    <update
+            id="updateTaskDone"
+    >
+        update task_table
+        set done = #{done}
+        where id = #{id};
+    </update>
+    <delete
+            id="deleteTask"
+    >
+        delete
+        from task_table
+        where id = #{id};
+    </delete>
+    <delete
+            id="deleteUserOwner"
+    >
+        delete
+        from user_task_table
+        where taskID = #{id};
+    </delete>
+    <delete
+            id="deleteTeamOwner"
+    >
+        delete
+        from team_task_table
+        where taskID = #{id};
+    </delete>
+</mapper>
